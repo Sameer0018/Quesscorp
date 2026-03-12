@@ -1,0 +1,25 @@
+# Render Blueprint: deploy Node.js backend from 'backend' folder
+# Docs: https://render.com/docs/blueprint-spec
+# Add a MySQL database elsewhere (e.g. PlanetScale, Railway) and set DATABASE vars in Render dashboard.
+
+services:
+  - type: web
+    name: hrms-lite-api
+    runtime: node
+    region: oregon
+
+    # Root directory for this service
+    rootDir: backend
+
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        generateValue: true
+      # Set these in Render Dashboard (Environment) - do not commit secrets:
+      # DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
+      # JWT_SECRET
+      # FRONTEND_URL (e.g. https://your-app.netlify.app)
