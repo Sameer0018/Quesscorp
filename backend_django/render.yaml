@@ -8,8 +8,8 @@
 # Build Command:
 #   pip install -r requirements.txt && python manage.py migrate --noinput
 
-# Start Command:
-#   python -m gunicorn hrms_lite.wsgi:application --bind 0.0.0.0:$PORT
+# Start Command (use run.sh so PORT is always set; fixes "No open HTTP ports detected"):
+#   bash run.sh
 
 # Environment (set in Render Dashboard → Environment):
 #   NODE_ENV=production  (optional)

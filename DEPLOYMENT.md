@@ -200,9 +200,9 @@ Use these exact values in the Render “Create Web Service” form when deployin
 | Field | Value |
 |-------|--------|
 | **Build Command** | `pip install -r requirements.txt && python manage.py migrate --noinput` |
-| **Start Command** | `python -m gunicorn hrms_lite.wsgi:application --bind 0.0.0.0:$PORT` |
+| **Start Command** | `bash run.sh` |
 
-`$PORT` is set by Render; do not replace it.
+The `run.sh` script binds gunicorn to `0.0.0.0:$PORT` (Render’s default is 10000). Using the script avoids “No open HTTP ports detected” when `$PORT` is not expanded in the dashboard start command.
 
 ### 4. Environment variables (Render → Environment)
 
@@ -246,3 +246,11 @@ Use in Netlify as:
 **`VITE_API_BASE_URL`** = `https://YOUR-SERVICE-NAME.onrender.com/api`
 
 Swagger docs: `https://YOUR-SERVICE-NAME.onrender.com/api/api-docs/`
+
+### 7. Troubleshooting: site slow or not opening
+
+- **Free tier cold start:** On the free tier, Render spins down the service after ~15 minutes of no traffic. The **first request** after that can take **30–60+ seconds** while the instance starts. The tab may look like it’s hanging; wait 1–2 minutes or try the health URL first:  
+  `https://YOUR-SERVICE-NAME.onrender.com/health`
+- **“No open HTTP ports detected” / “Port scan timeout reached”:** Use **Start Command** `bash run.sh` (see above). The script binds gunicorn to Render’s `PORT` so the port scan succeeds.
+- **If it never loads:** In Render dashboard → **Logs**, check for errors (e.g. DB connection, missing env). Ensure the start command is `bash run.sh`.
+- **To reduce cold starts:** Upgrade to a paid plan (always-on), or use an external cron (e.g. cron-job.org) to ping your `/health` URL every 10–15 minutes.
