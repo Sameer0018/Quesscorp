@@ -1,0 +1,25 @@
+# Render: Django backend (backend_django)
+# Use this when creating the Web Service, or set the same in the dashboard.
+
+# Service type: Web Service
+# Runtime: Python 3
+# Root Directory: backend_django
+
+# Build Command:
+#   pip install -r requirements.txt && python manage.py migrate --noinput
+
+# Start Command:
+#   python -m gunicorn hrms_lite.wsgi:application --bind 0.0.0.0:$PORT
+
+# Environment (set in Render Dashboard → Environment):
+#   NODE_ENV=production  (optional)
+#   DEBUG=False
+#   ALLOWED_HOSTS=.onrender.com,your-service-name.onrender.com
+#   DB_HOST=...
+#   DB_PORT=3306
+#   DB_USER=...
+#   DB_PASSWORD=...
+#   DB_NAME=...
+#   JWT_SECRET=...
+#   DJANGO_SECRET_KEY=...
+#   FRONTEND_URL=https://your-app.netlify.app

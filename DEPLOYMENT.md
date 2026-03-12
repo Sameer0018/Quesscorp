@@ -175,16 +175,74 @@ Then redeploy the backend so CORS allows the frontend.
 
 ---
 
-## Deploying Django backend on Render instead of Node
+---
 
-If you want to use the **Django** backend on Render:
+## Deploy Django backend on Render (step-by-step)
 
-1. **Root Directory:** `backend_django`
-2. **Runtime:** `Python 3`
-3. **Build Command:** `pip install -r requirements.txt`
-4. **Start Command:** `python manage.py migrate && gunicorn hrms_lite.wsgi:application`  
-   - Add `gunicorn` to `requirements.txt`.
-5. Set the same env vars (DB_*, JWT_SECRET, FRONTEND_URL).  
-6. For a DB that already had Node’s `users` table, run `fix_users_table` once (e.g. via Render Shell), then `python manage.py seed_hrms`.
+Use these exact values in the Render “Create Web Service” form when deploying **backend_django**.
 
-Frontend and Netlify steps stay the same; only the backend URL and which backend you run change.
+### 1. Connect repo
+
+- Connect **GitHub** and select your repo (e.g. `hrms-lite`).
+- **Branch:** `main`
+
+### 2. Basic settings
+
+| Field | Value |
+|-------|--------|
+| **Name** | `hrms-lite-api` (or any name) |
+| **Region** | e.g. **Oregon (US West)** |
+| **Language** | **Python 3** |
+| **Root Directory** | `backend_django` |
+
+### 3. Build & start commands
+
+| Field | Value |
+|-------|--------|
+| **Build Command** | `pip install -r requirements.txt && python manage.py migrate --noinput` |
+| **Start Command** | `python -m gunicorn hrms_lite.wsgi:application --bind 0.0.0.0:$PORT` |
+
+`$PORT` is set by Render; do not replace it.
+
+### 4. Environment variables (Render → Environment)
+
+Add these in the Render dashboard for your service:
+
+| Key | Value | Required |
+|-----|--------|----------|
+| `DEBUG` | `False` | Yes |
+| `DJANGO_SECRET_KEY` | long random string (e.g. `openssl rand -hex 32`) | Yes |
+| `JWT_SECRET` | long random string | Yes |
+| `DB_HOST` | your MySQL host | Yes |
+| `DB_PORT` | `3306` | Yes |
+| `DB_USER` | your MySQL user | Yes |
+| `DB_PASSWORD` | your MySQL password | Yes |
+| `DB_NAME` | your MySQL database name | Yes |
+| `FRONTEND_URL` | `https://YOUR-NETLIFY-SITE.netlify.app` (no trailing slash) | Yes |
+| `ALLOWED_HOSTS` | `.onrender.com` (optional; default in code already allows it) | No |
+
+### 5. First deploy and DB setup
+
+- Click **Create Web Service**. The first deploy may fail if the database is empty or the `users` table is from Node.
+- **If the DB is new:** run migrations and seed from your PC (with same `DB_*` as Render), or use **Render Shell** (Service → Shell):
+  ```bash
+  python manage.py migrate --noinput
+  python manage.py seed_hrms
+  ```
+- **If the DB already had the Node `users` table:** in Render Shell run:
+  ```bash
+  python manage.py fix_users_table
+  python manage.py seed_hrms
+  ```
+
+### 6. API URL for frontend
+
+After a successful deploy, your API base URL will be:
+
+`https://YOUR-SERVICE-NAME.onrender.com`
+
+Use in Netlify as:
+
+**`VITE_API_BASE_URL`** = `https://YOUR-SERVICE-NAME.onrender.com/api`
+
+Swagger docs: `https://YOUR-SERVICE-NAME.onrender.com/api/api-docs/`

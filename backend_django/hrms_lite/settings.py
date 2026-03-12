@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('JWT_SECRET') or 'dev-secret-change-in-production'
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('1', 'true', 'yes')
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').replace(' ', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
